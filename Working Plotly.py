@@ -23,7 +23,7 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                 dcc.Dropdown(id='site-dropdown',
                                 options=[{'label': 'All Sites', 'value': 'ALL'},{'label': 'CCAFS LC-40', 'value': 'CCAFS LC-40'},
                                 {'label': 'CCAFS SLC-40', 'value': 'CCAFS SLC-40'},{'label': 'KSC LC-39A', 'value': 'KSC LC-39A'},
-                                {'label': 'VAFB SLC-4E', 'value': 'VAFB SLC-4E'}],value="All",
+                                {'label': 'VAFB SLC-4E', 'value': 'VAFB SLC-4E'}],value="",
                                 placeholder="Select a Launch Site here",
                                 searchable=True),
                                 html.Br(),
@@ -51,15 +51,17 @@ def get_pie_chart(entered_site):
         filtered_df = filtered_df.groupby('Launch Site')['class'].sum()
         fig = px.pie(filtered_df, values=filtered_df.values, 
         names=filtered_df.index, 
-        title='title')
+        title=(f'Successful launches of {entered_site} sites')
         #total successful launches because failures are 0 wont be aggregated
         return fig
-    else:
+    elif entered_site != '' :
         filtered_df = filtered_df[(['Launch Site'] == entered_site)]
-        filtered_df = filtered_df.groupby('class').sum()
-        fig = px.pie(filtered_df, values=filtered_df.values, 
-        names=filtered_df.index, 
-        title='success to failure of '+ entered_site) 
+        nos = filtered_df[filtered_df['class'] ==1 ].value_counts()
+        nof = filtered_df[filtered_df['class'] ==0 ].value_counts()
+        piearr = [nos.shape[0],nof.shape[0]]
+        fig = px.pie(values=piearr, 
+        names=['Success','Failure'], 
+        title='Success to failure of '+ entered_site) 
         return fig
         # return the outcomes piechart for a selected site
 # TASK 4:
